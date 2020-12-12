@@ -14,7 +14,9 @@ import java.net.*;
 import java.io.*;
 
 public class Server {
+
    public static void main( String argv[] ) throws Exception {
+
       String capitalizedSentence = null; 
       int port = 4567;
 	  int maxLength = 255;
@@ -31,7 +33,21 @@ public class Server {
 	  /* Display message that the UDP echo server is running */
       System.out.println( "Starting a UDP Echo Server on port " + port );
 
+      /* By Panagiotis Fotakidis
+      		Creates Server socket and a normal socket for other clients to connect.*/
+
+      ServerSocket serverSocket = new ServerSocket(4567);
+      Socket socket1 = serverSocket.accept();
+
+      /* By Panagiotis Fotakidis
+      		Checks if the socket is connected to client. */
+
+      if (socket1.isConnected())
+	  	System.out.println(" A Client got Connected!");
+
+
 	  while( true ) {
+
 		/* Set the max length of datagram to 255 */
 		indatagram.setLength( maxLength );
 	
@@ -42,8 +58,16 @@ public class Server {
 		String msgFromClient = new String( indatagram.getData(), 0, indatagram.getLength() );
 		
 		/* Display the message on the screen */
-		System.out.println( "\nMessage received from " + indatagram.getAddress() + " from port "
+		System.out.println( "\n Message received from " + indatagram.getAddress() + " from port "
 							+ indatagram.getPort() + ".\nContent: " + msgFromClient );
+
+		/*By Panagiotis Fotakidis
+			Checks if the user wants to exit by typing exit, and shows the appropriate message, while the socket is being closed by the client. */
+
+		if(msgFromClient.equals("exit")) {
+			System.out.println("Client got Disconnected!");
+			continue;
+		}
 		
 		/* Capitalize the received message */
 		capitalizedSentence = msgFromClient.toUpperCase() + '\n';
@@ -60,6 +84,8 @@ public class Server {
 	  }
    }
 }
+
+
 
 /*
  * Example:

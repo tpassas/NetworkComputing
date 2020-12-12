@@ -25,7 +25,7 @@ private boolean typeOfClosingTheAuction;
 /*Argyropoulos! This is a method in order to generate an AuctionID when a client is listing an item *
 /It is not possible to generate the same number!!!! but there is a limited range of numbers from 1000 to 10000*/
 	
-	public static void generateAuctionID() {
+	public static int generateAuctionID() {
 		ArrayList<Integer> numbers = new ArrayList<Integer>();
 		Random random = new Random();
 			for (int i=1000; i<=10000; i++)
@@ -33,7 +33,7 @@ private boolean typeOfClosingTheAuction;
 			Collections.shuffle(numbers);
 			// System.out.println(numbers.get(0));
 			AuctionNumbers.add(numbers.get(0));
-			System.out.println(numbers.get(0));
+			return numbers.get(0);
 
 	}
 
@@ -52,10 +52,9 @@ private boolean typeOfClosingTheAuction;
 
 		//Argyropoulos! (for later) System.out.println("Enter the type of the auction");
 
-		System.out.println("Thank you theese are the cresendials you entered Item name:" + itemName +(" Item Description:")  +itemDescription+(" itemStartPrice:") +itemStartPrice);
+		System.out.println("\n Thank you! These are the cresendials you entered.\n Item name : " + itemName + "\n Item Description : " + itemDescription + " \n Starting Price : " +itemStartPrice);
 
-		System.out.println("This is the auctionID");
-		generateAuctionID();
+		System.out.println("\n The auction ID for this auction is : " + generateAuctionID());
 	}
 
 
@@ -73,6 +72,7 @@ private boolean typeOfClosingTheAuction;
 	}
 
     public static void main(String [] argv) throws Exception {
+
 		int port, maxLength = 255;
 		String hostname;
 		String lineToServer, lineFromServer;
@@ -83,12 +83,14 @@ private boolean typeOfClosingTheAuction;
 		/* Second argument is the port in which the server accepts connections */
 		port = Integer.parseInt( argv[1] );
 
+		Socket socket1 = new Socket(hostname, port);
+
 		/* Determine the IP address of the server from the hostname */
 		InetAddress serverAddr = InetAddress.getByName(hostname);
 
 		while ( true ) {
 			/*Argyropoulos! Give to the client the options */
-			System.out.println( "Type auction :enter to an auction with auction ID\nType item:List an Item\nType exit: quit");
+			System.out.println( "Type Auction -> Enter an auction by using the auction ID ! \n Type Item -> List an item for auction! \n Type exit : quit !");
 
 			/* Create a buffer to hold the user's input */
 			BufferedReader userInput = new BufferedReader( new InputStreamReader ( System.in ) );
@@ -97,16 +99,14 @@ private boolean typeOfClosingTheAuction;
 			lineToServer = userInput.readLine();
 
 			/*Argyropoulos! when the client want to list an item for auction */
-			if ( lineToServer.equals( "item" ) )
+			if ( lineToServer.equals( "Item" ) )
 				listItem();
 			/*Argyropoulos! when the client want to enter to an auction */
-			if ( lineToServer.equals( "auction" ) )
+			if ( lineToServer.equals( "Auction" ) )
 				enterAuction();
 
 
 			/* Stop infinite loop if user wants to stop getting echos by typing exit */
-			if ( lineToServer.equals( "exit" ) )
-				break;
 
 			/* Create array of 255 bytes to hold outgoing message */
 			byte[] data = new byte[maxLength];
@@ -123,6 +123,11 @@ private boolean typeOfClosingTheAuction;
 			/* Send the datagram through the socket */
 			socket.send( outToServer );
 
+			if ( lineToServer.equals( "exit" ) ) {
+				socket1.close();
+				break;
+			}
+
 			/* Create array of 255 raw bytes to hold incoming message */
 			byte [] response = new byte[maxLength];
 		
@@ -137,7 +142,9 @@ private boolean typeOfClosingTheAuction;
 
 			/* Output echoed message to the screen */
 			System.out.println( "Received: " + lineFromServer );
+
 		}
+
 	}
 }
 
