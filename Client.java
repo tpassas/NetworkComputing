@@ -126,6 +126,8 @@ private boolean typeOfClosingTheAuction;
 			if ( lineToServer.equals( "exit" ) ) {
 				socket1.close();
 				break;
+
+			
 			}
 
 			/* Create array of 255 raw bytes to hold incoming message */
