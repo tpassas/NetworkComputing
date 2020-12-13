@@ -11,18 +11,92 @@
 
 /* for the use of arraylist and scanner */
 import java.util.*;
-
 import java.net.*;
 import java.io.*;
 
 public class Client {
-private static ArrayList<Integer> AuctionNumbers = new ArrayList<Integer>();
-private String itemName;
-private String itemDescription;
-private int itemStartPrice;
-private boolean typeOfClosingTheAuction;
+
+	private static ArrayList<Integer> AuctionNumbers = new ArrayList<Integer>();
+	private String itemName;
+	private String itemDescription;
+	private int itemStartPrice;
+	private boolean typeOfClosingTheAuction;
 	
-/*Argyropoulos! This is a method in order to generate an AuctionID when a client is listing an item *
+
+    public static void main(String [] argv) throws Exception {
+
+		int port, maxLength = 255;
+		String hostname;
+		String receivedMsg, responseMsg;
+		boolean connection ;
+		
+		
+		hostname = new String( argv[0] );
+		port = Integer.parseInt( argv[1] );
+
+		Scanner scanner = new Scanner(System.in);
+
+		Socket socket1 = new Socket(hostname, port);
+
+		OutputStream outStream = socket1.getOutputStream();
+		DataOutputStream dataOutStream = new DataOutputStream(outStream);
+
+		InputStream inStream = socket1.getInputStream();
+		DataInputStream dataInStream = new DataInputStream(inStream);
+
+
+
+
+
+		while ( true ) {
+
+
+			/*Argyropoulos! Give to the client the options */
+			System.out.println( " Type to send a message! \n  Type exit to quit!");
+
+			
+			//BufferedReader userInput = new BufferedReader( new InputStreamReader ( System.in ) );
+			responseMsg = scanner.nextLine();
+
+			dataOutStream.writeUTF(responseMsg);
+			dataOutStream.flush();
+			//dataOutStream.close();
+
+			
+			//lineToServer = userInput.readLine();
+			//byte[] data = new byte[maxLength];
+			//data = lineToServer.getBytes();
+
+
+			//DatagramPacket outToServer = new DatagramPacket( data, data.length, serverAddr, port );
+			//DatagramSocket socket = new DatagramSocket();
+			//socket.send( outToServer );
+
+			if ( responseMsg.equals( "exit" ) ) {
+				socket1.close();
+				break;
+			}
+
+
+
+			receivedMsg = dataInStream.readUTF();
+			System.out.println(receivedMsg);
+			//byte [] response = new byte[maxLength];
+	
+
+			//DatagramPacket inFromServer = new DatagramPacket( response, maxLength );
+			//socket.receive( inFromServer );
+
+
+			//lineFromServer = new String( inFromServer.getData(), 0, inFromServer.getLength());
+
+			//System.out.println( "Received: " + lineFromServer );
+
+		}
+
+	}
+
+	/*Argyropoulos! This is a method in order to generate an AuctionID when a client is listing an item *
 /It is not possible to generate the same number!!!! but there is a limited range of numbers from 1000 to 10000*/
 	
 	public static int generateAuctionID() {
@@ -69,84 +143,6 @@ private boolean typeOfClosingTheAuction;
 			System.out.println("YEA");
 		}
 		
-	}
-
-    public static void main(String [] argv) throws Exception {
-
-		int port, maxLength = 255;
-		String hostname;
-		String lineToServer, lineFromServer;
-		
-		/* First argument is the running server's name */
-		hostname = new String( argv[0] );
-
-		/* Second argument is the port in which the server accepts connections */
-		port = Integer.parseInt( argv[1] );
-
-		Socket socket1 = new Socket(hostname, port);
-
-		/* Determine the IP address of the server from the hostname */
-		InetAddress serverAddr = InetAddress.getByName(hostname);
-
-		while ( true ) {
-			/*Argyropoulos! Give to the client the options */
-			System.out.println( "Type Auction -> Enter an auction by using the auction ID ! \n Type Item -> List an item for auction! \n Type exit : quit !");
-
-			/* Create a buffer to hold the user's input */
-			BufferedReader userInput = new BufferedReader( new InputStreamReader ( System.in ) );
-
-			/* Get the user's input */
-			lineToServer = userInput.readLine();
-
-			/*Argyropoulos! when the client want to list an item for auction */
-			if ( lineToServer.equals( "Item" ) )
-				listItem();
-			/*Argyropoulos! when the client want to enter to an auction */
-			if ( lineToServer.equals( "Auction" ) )
-				enterAuction();
-
-
-			/* Stop infinite loop if user wants to stop getting echos by typing exit */
-
-			/* Create array of 255 bytes to hold outgoing message */
-			byte[] data = new byte[maxLength];
-
-			/* Convert the string message into bytes */
-			data = lineToServer.getBytes();
-
-			/* Create datagram to send to server specifying message, message length, server address, port */
-			DatagramPacket outToServer = new DatagramPacket( data, data.length, serverAddr, port );
-
-			/* Create a datagram socket through which the data will be send */
-			DatagramSocket socket = new DatagramSocket();
-
-			/* Send the datagram through the socket */
-			socket.send( outToServer );
-
-			if ( lineToServer.equals( "exit" ) ) {
-				socket1.close();
-				break;
-
-			
-			}
-
-			/* Create array of 255 raw bytes to hold incoming message */
-			byte [] response = new byte[maxLength];
-		
-			/* Create a datagram to receive from server specifying the message received */
-			DatagramPacket inFromServer = new DatagramPacket( response, maxLength );
-
-			/* Receive the echo datagram from server (capitalized) */
-			socket.receive( inFromServer );
-
-			/* Convert received byte array to string for displaying */
-			lineFromServer = new String( inFromServer.getData(), 0, inFromServer.getLength());
-
-			/* Output echoed message to the screen */
-			System.out.println( "Received: " + lineFromServer );
-
-		}
-
 	}
 }
 

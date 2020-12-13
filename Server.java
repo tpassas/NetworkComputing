@@ -20,67 +20,75 @@ public class Server {
       String capitalizedSentence = null; 
       int port = 4567;
 	  int maxLength = 255;
+	  String receivedMsg, responceMsg;
 
-	  /* Create a receiving datagram data buffer */
-	  byte[] buffer = new byte[255];
+	 // byte[] buffer = new byte[255];
 
-	  /* Create receiving datagram object of maximum size maxLength */
-	  DatagramPacket indatagram = new DatagramPacket( buffer, maxLength );
+	 // DatagramPacket indatagram = new DatagramPacket( buffer, maxLength );
+	 // DatagramSocket socket = new DatagramSocket( port );
+	  
+	  ServerSocket ss = new ServerSocket(4567);
 
-	  /* Create a UDP socket on a specific port */
-	  DatagramSocket socket = new DatagramSocket( port );
+      System.out.println(" Starting a UDP Echo Server on port " + port +"\n");
+      System.out.println(" Waiting for a connection... ");
 
-	  /* Display message that the UDP echo server is running */
-      System.out.println( "Starting a UDP Echo Server on port " + port );
-
-      /* By Panagiotis Fotakidis
-      		Creates Server socket and a normal socket for other clients to connect.*/
-
-      ServerSocket serverSocket = new ServerSocket(4567);
-      Socket socket1 = serverSocket.accept();
-
-      /* By Panagiotis Fotakidis
-      		Checks if the socket is connected to client. */
+      Socket socket1 = ss.accept();
+      InetSocketAddress socket1Use = (InetSocketAddress)socket1.getRemoteSocketAddress();
 
       if (socket1.isConnected())
-	  	System.out.println(" A Client got Connected!");
+	  	System.out.println("Client from : " + socket1Use.getAddress() + " ------------> Is now Connected! \n");
+
+	  InputStream inStream = socket1.getInputStream();
+	  DataInputStream dataInStream = new DataInputStream(inStream);
+
+	  OutputStream outStream = socket1.getOutputStream();
+	  DataOutputStream dataOutStream = new DataOutputStream(outStream);
 
 
 	  while( true ) {
 
-		/* Set the max length of datagram to 255 */
-		indatagram.setLength( maxLength );
-	
-		/* Receive the datagram from the client  */
-		socket.receive( indatagram );
+		receivedMsg = dataInStream.readUTF();
+
+		if(receivedMsg.equals("exit")) {
+			System.out.println("Client from : " + socket1Use.getAddress() + " ------------> Is now Disconnected!");
+			ss.close();
+			socket1.close();
+			break;
+		}
+
+		System.out.println("The message received is " + receivedMsg + "\n");
+
+		responceMsg = " Your message : " + receivedMsg + ". Has been recorded to the Server! \n";
+
+		dataOutStream.writeUTF(responceMsg);
+		dataOutStream.flush();
+
+		//indatagram.setLength( maxLength );
+
+		//socket.receive( indatagram );
 		
-		/* Convert the message from the byte array to a string array for displaying */
-		String msgFromClient = new String( indatagram.getData(), 0, indatagram.getLength() );
 		
-		/* Display the message on the screen */
-		System.out.println( "\n Message received from " + indatagram.getAddress() + " from port "
-							+ indatagram.getPort() + ".\nContent: " + msgFromClient );
+		//String msgFromClient = new String( indatagram.getData(), 0, indatagram.getLength() );
+		
+		
+		//System.out.println( "\n Message received from " + indatagram.getAddress() + " from port "
+		//					+ indatagram.getPort() + ".\nContent: " + msgFromClient );
 
 		/*By Panagiotis Fotakidis
 			Checks if the user wants to exit by typing exit, and shows the appropriate message, while the socket is being closed by the client. */
-
-		if(msgFromClient.equals("exit")) {
-			System.out.println("Client got Disconnected!");
-			continue;
-		}
 		
-		/* Capitalize the received message */
-		capitalizedSentence = msgFromClient.toUpperCase() + '\n';
 		
-		/* Create a new datagram data buffer (byte array) for echoing capitalized message */
-		byte[] msgToClient = capitalizedSentence.getBytes(); 
+		//capitalizedSentence = msgFromClient.toUpperCase() + '\n';
 		
-		/* Create an outgoing datagram by extracting the client's address and port from incoming datagram */
-		DatagramPacket outdatagram = new DatagramPacket( msgToClient, msgToClient.length,
-									 indatagram.getAddress(), indatagram.getPort() );
 		
-		/* Send the reply back to the client */
-		socket.send( outdatagram );
+		//byte[] msgToClient = capitalizedSentence.getBytes(); 
+		
+		
+		//DatagramPacket outdatagram = new DatagramPacket( msgToClient, msgToClient.length,
+		//							 indatagram.getAddress(), indatagram.getPort() );
+		
+		
+		//socket.send( outdatagram );
 	  }
    }
 }
