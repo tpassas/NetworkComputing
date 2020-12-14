@@ -15,82 +15,64 @@ import java.io.*;
 
 public class Server {
 
-   public static void main( String argv[] ) throws Exception {
+    public static void main( String argv[] ) throws Exception {
 
       String capitalizedSentence = null; 
       int port = 4567;
 	  int maxLength = 255;
 	  String receivedMsg, responceMsg;
+	  boolean connection ;
 
 	 // byte[] buffer = new byte[255];
 
 	 // DatagramPacket indatagram = new DatagramPacket( buffer, maxLength );
 	 // DatagramSocket socket = new DatagramSocket( port );
 	  
-	  ServerSocket ss = new ServerSocket(4567);
-
+      ServerSocket ss = new ServerSocket(4567);
       System.out.println(" Starting a UDP Echo Server on port " + port +"\n");
-      System.out.println(" Waiting for a connection... ");
 
-      Socket socket1 = ss.accept();
-      InetSocketAddress socket1Use = (InetSocketAddress)socket1.getRemoteSocketAddress();
+      while(true){
+        System.out.println(" Waiting for a connection... ");
 
-      if (socket1.isConnected())
-	  	System.out.println("Client from : " + socket1Use.getAddress() + " ------------> Is now Connected! \n");
+        Socket socket1 = ss.accept();
+        InetSocketAddress socket1Use = (InetSocketAddress)socket1.getRemoteSocketAddress();
 
-	  InputStream inStream = socket1.getInputStream();
-	  DataInputStream dataInStream = new DataInputStream(inStream);
+        connection = socket1.isConnected(); //HERE
 
-	  OutputStream outStream = socket1.getOutputStream();
-	  DataOutputStream dataOutStream = new DataOutputStream(outStream);
+        if (connection)
+	  	 System.out.println("Client from : " + socket1Use.getAddress() + " ------------> Is now Connected! \n");
+	  	else
+	  	 System.out.println("Client from : " + socket1Use.getAddress() + " ------------>  Unable to Connect!! \n");
+
+	    InputStream inStream = socket1.getInputStream();
+	    DataInputStream dataInStream = new DataInputStream(inStream);
+
+	    OutputStream outStream = socket1.getOutputStream();
+	    DataOutputStream dataOutStream = new DataOutputStream(outStream);
 
 
-	  while( true ) {
+	    while( connection ) {
 
-		receivedMsg = dataInStream.readUTF();
+		  receivedMsg = dataInStream.readUTF();
 
-		if(receivedMsg.equals("exit")) {
+		  if(receivedMsg.equals("exit")) {
+
 			System.out.println("Client from : " + socket1Use.getAddress() + " ------------> Is now Disconnected!");
-			ss.close();
-			socket1.close();
+			//ss.close();//HERE
+			// socket1.close(); //HERE
+			connection = false;
 			break;
+		  }
+
+		  System.out.println("The message received is " + receivedMsg + "\n");
+
+		  responceMsg = " Your message : ' " + receivedMsg + ". Has been recorded to the Server! \n";
+
+		  dataOutStream.writeUTF(responceMsg);
+		  dataOutStream.flush();
 		}
-
-		System.out.println("The message received is " + receivedMsg + "\n");
-
-		responceMsg = " Your message : " + receivedMsg + ". Has been recorded to the Server! \n";
-
-		dataOutStream.writeUTF(responceMsg);
-		dataOutStream.flush();
-
-		//indatagram.setLength( maxLength );
-
-		//socket.receive( indatagram );
-		
-		
-		//String msgFromClient = new String( indatagram.getData(), 0, indatagram.getLength() );
-		
-		
-		//System.out.println( "\n Message received from " + indatagram.getAddress() + " from port "
-		//					+ indatagram.getPort() + ".\nContent: " + msgFromClient );
-
-		/*By Panagiotis Fotakidis
-			Checks if the user wants to exit by typing exit, and shows the appropriate message, while the socket is being closed by the client. */
-		
-		
-		//capitalizedSentence = msgFromClient.toUpperCase() + '\n';
-		
-		
-		//byte[] msgToClient = capitalizedSentence.getBytes(); 
-		
-		
-		//DatagramPacket outdatagram = new DatagramPacket( msgToClient, msgToClient.length,
-		//							 indatagram.getAddress(), indatagram.getPort() );
-		
-		
-		//socket.send( outdatagram );
 	  }
-   }
+    }
 }
 
 

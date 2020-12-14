@@ -28,7 +28,6 @@ public class Client {
 		int port, maxLength = 255;
 		String hostname;
 		String receivedMsg, responseMsg;
-		boolean connection ;
 		
 		
 		hostname = new String( argv[0] );
@@ -51,28 +50,16 @@ public class Client {
 		while ( true ) {
 
 
-			/*Argyropoulos! Give to the client the options */
-			System.out.println( " Type to send a message! \n  Type exit to quit!");
-
+			System.out.println( "\n -------------------------------------- \n Type a message to send to the Server! \n Type 'exit' to quit! \n -------------------------------------- ");	
 			
-			//BufferedReader userInput = new BufferedReader( new InputStreamReader ( System.in ) );
 			responseMsg = scanner.nextLine();
 
 			dataOutStream.writeUTF(responseMsg);
 			dataOutStream.flush();
-			//dataOutStream.close();
-
-			
-			//lineToServer = userInput.readLine();
-			//byte[] data = new byte[maxLength];
-			//data = lineToServer.getBytes();
-
-
-			//DatagramPacket outToServer = new DatagramPacket( data, data.length, serverAddr, port );
-			//DatagramSocket socket = new DatagramSocket();
-			//socket.send( outToServer );
+		
 
 			if ( responseMsg.equals( "exit" ) ) {
+				System.out.println(" You have Disconnected Successfully!");
 				socket1.close();
 				break;
 			}
@@ -81,16 +68,6 @@ public class Client {
 
 			receivedMsg = dataInStream.readUTF();
 			System.out.println(receivedMsg);
-			//byte [] response = new byte[maxLength];
-	
-
-			//DatagramPacket inFromServer = new DatagramPacket( response, maxLength );
-			//socket.receive( inFromServer );
-
-
-			//lineFromServer = new String( inFromServer.getData(), 0, inFromServer.getLength());
-
-			//System.out.println( "Received: " + lineFromServer );
 
 		}
 
