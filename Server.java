@@ -1,15 +1,4 @@
-/*
- * Filename: UDPEchoServer.java
- * Description: An echo server using connectionless delivery system (UDP).
- *              Receives character messages at a specified (hardcoded) port.
- *              The message is send back to the client capitalized.
- *              No error handling and exceptions are implemented.
- * Operation: java UDPEchoServer
- *
- * Author: Thanos Hatziapostolou
- * Module: Network Computing
- */
-
+import java.util.*;
 import java.net.*;
 import java.io.*;
 
@@ -17,27 +6,31 @@ public class Server {
 
     public static void main( String argv[] ) throws Exception {
 
-      String capitalizedSentence = null; 
-      int port = 4567;
-	  int maxLength = 255;
-	  String receivedMsg, responceMsg;
-	  boolean connection ;
-
-	 // byte[] buffer = new byte[255];
-
-	 // DatagramPacket indatagram = new DatagramPacket( buffer, maxLength );
-	 // DatagramSocket socket = new DatagramSocket( port );
+      int bid,startingPrice, id = 0, port = 4567;
+	  String receivedMsg, responceMsg, name, description;
+	  boolean connection;
 	  
+
+
+	 ArrayList<String> auctionStrings = new ArrayList();
+
+	 // ArrayList<Integer> id  = new ArrayList<Integer>();
+	  ArrayList<String> namesList = new ArrayList<String>();
+	  ArrayList<String> descriptionsList = new ArrayList<String>();
+      ArrayList<Integer> bidsList = new ArrayList<Integer>();
+      ArrayList<Integer> startingPriceList = new ArrayList<Integer>();
+
       ServerSocket ss = new ServerSocket(4567);
       System.out.println(" Starting a UDP Echo Server on port " + port +"\n");
 
       while(true){
+
         System.out.println(" Waiting for a connection... ");
 
         Socket socket1 = ss.accept();
         InetSocketAddress socket1Use = (InetSocketAddress)socket1.getRemoteSocketAddress();
 
-        connection = socket1.isConnected(); //HERE
+        connection = socket1.isConnected(); 
 
         if (connection)
 	  	 System.out.println("Client from : " + socket1Use.getAddress() + " ------------> Is now Connected! \n");
@@ -53,35 +46,45 @@ public class Server {
 
 	    while( connection ) {
 
+	      responceMsg = " ";
+
 		  receivedMsg = dataInStream.readUTF();
 
-		  if(receivedMsg.equals("exit")) {
-
-			System.out.println("Client from : " + socket1Use.getAddress() + " ------------> Is now Disconnected!");
-			//ss.close();//HERE
-			// socket1.close(); //HERE
+		  if( receivedMsg.equals("Exit") ){
+		  	System.out.println("Client from : " + socket1Use.getAddress() + " ------------> Is now Disconnected!");
 			connection = false;
-			break;
+			break; 
 		  }
+		  else if( receivedMsg.equals("Register") ){
 
-		  System.out.println("The message received is " + receivedMsg + "\n");
+		  	System.out.println(" \n New Auction Registry! \n");
+		  	name = dataInStream.readUTF();
+		  	namesList.add(name);
+		  	System.out.println("Recorded : ' " + name + " ' to --> " + namesList);
 
-		  responceMsg = " Your message : ' " + receivedMsg + ". Has been recorded to the Server! \n";
+		  	description = dataInStream.readUTF();
+		  	descriptionsList.add(description);
+		  	System.out.println("Recorded : ' " + description + " ' to --> " + descriptionsList);
 
-		  dataOutStream.writeUTF(responceMsg);
-		  dataOutStream.flush();
+		  	bid = dataInStream.readInt();
+		  	bidsList.add(bid);
+		  	System.out.println("Recorded : ' " + bid + " ' to --> " + bidsList);
+
+		  	startingPrice = dataInStream.readInt();
+		  	startingPriceList.add(startingPrice);
+		  	System.out.println("Recorded : ' " + (int)startingPrice + " ' to --> " + startingPriceList);
+
+		  	System.out.println("Recorded All!");
+
+		  	responceMsg = "Your auction has been Recorder : \n " + namesList + descriptionsList + bidsList + startingPriceList;
+		  	dataOutStream.writeUTF(responceMsg);
+		  	dataOutStream.flush();
+
+			auctionStrings.add(responceMsg);
+			System.out.println(auctionStrings);
+
+		  }
 		}
 	  }
     }
 }
-
-
-
-/*
- * Example:
- *   java UDPEchoServer
- * Output:
- *	 Starting a UDP Echo Server on port 4567:
- *   Message Received from: hatziapostolou/197.87.76.3 on port 1354
- *   Content: Hello server
- */

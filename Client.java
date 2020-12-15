@@ -17,8 +17,7 @@ import java.io.*;
 public class Client {
 
 	private static ArrayList<Integer> AuctionNumbers = new ArrayList<Integer>();
-	private String itemName;
-	private String itemDescription;
+	private String promptMessage;
 	private int itemStartPrice;
 	private boolean typeOfClosingTheAuction;
 	
@@ -27,7 +26,7 @@ public class Client {
 
 		int port, maxLength = 255;
 		String hostname;
-		String receivedMsg, responseMsg;
+		String toReceiveMsg, toSendMsg;
 		
 		
 		hostname = new String( argv[0] );
@@ -50,28 +49,52 @@ public class Client {
 		while ( true ) {
 
 
-			System.out.println( "\n -------------------------------------- \n Type a message to send to the Server! \n Type 'exit' to quit! \n -------------------------------------- ");	
-			
-			responseMsg = scanner.nextLine();
-
-			dataOutStream.writeUTF(responseMsg);
-			dataOutStream.flush();
-		
-
-			if ( responseMsg.equals( "exit" ) ) {
-				System.out.println(" You have Disconnected Successfully!");
-				socket1.close();
-				break;
-			}
+		  System.out.println( "\n -------------------------------------- \n Type > Register --> To register a new item for Auction \n Type > Search --> To search for an Auction using the Auction ID. \n Type > Bid --> To bid on an Auction using the Auction ID.");
+		  System.out.println(" Type > Exit --> To quit! \n -------------------------------------- ");
 
 
+		  toSendMsg = scanner.nextLine();
+		  dataOutStream.writeUTF(toSendMsg);
+		  dataOutStream.flush();
 
-			receivedMsg = dataInStream.readUTF();
-			System.out.println(receivedMsg);
+		  if(toSendMsg.equals("Exit")){
 
+		    System.out.println(" You have Disconnected Successfully!");
+			socket1.close();
+			break;
+		  } 
+
+		  for (int i = 0; i <= 3; i++){
+
+		  	System.out.println(registerMessages(i));
+
+		    toSendMsg = scanner.nextLine();
+		    dataOutStream.writeUTF(toSendMsg);
+		    dataOutStream.flush();
+
+		  }
+
+		   toReceiveMsg = dataInStream.readUTF();
+		   System.out.println(toReceiveMsg);
 		}
 
 	}
+
+	public static String registerMessages(int i){
+		String message;
+
+		if (i == 0)
+			message = " Write the name of the Item !";
+		else if (i == 1)
+			message = " Write the description of the Item !";
+		else if (i == 2)
+			message = " Write the bid of the Item !";
+		else message = " Write the starting price of the Item !";
+
+		return message;
+
+	}
+
 
 	/*Argyropoulos! This is a method in order to generate an AuctionID when a client is listing an item *
 /It is not possible to generate the same number!!!! but there is a limited range of numbers from 1000 to 10000*/
