@@ -42,10 +42,6 @@ public class Client {
 		InputStream inStream = socket1.getInputStream();
 		DataInputStream dataInStream = new DataInputStream(inStream);
 
-
-
-
-
 		while ( true ) {
 
 
@@ -64,7 +60,7 @@ public class Client {
 			break;
 		  } 
 
-		  for (int i = 0; i <= 3; i++){
+		  for (int i = 0; i <= 2; i++){
 
 		  	System.out.println(registerMessages(i));
 
@@ -87,9 +83,9 @@ public class Client {
 			message = " Write the name of the Item !";
 		else if (i == 1)
 			message = " Write the description of the Item !";
-		else if (i == 2)
-			message = " Write the bid of the Item !";
-		else message = " Write the starting price of the Item !";
+		else
+			message = " Write the starting price of the Item !";
+		
 
 		return message;
 

@@ -7,21 +7,13 @@ public class Server {
     public static void main( String argv[] ) throws Exception {
 
       int bid,startingPrice, id = 0, port = 4567;
-	  String receivedMsg, responceMsg, name, description;
+	  String receivedMsg, responceMsg, registryMsg, name,message = "";
 	  boolean connection;
-	  
-
-
-	 ArrayList<String> auctionStrings = new ArrayList();
-
-	 // ArrayList<Integer> id  = new ArrayList<Integer>();
-	  ArrayList<String> namesList = new ArrayList<String>();
-	  ArrayList<String> descriptionsList = new ArrayList<String>();
-      ArrayList<Integer> bidsList = new ArrayList<Integer>();
-      ArrayList<Integer> startingPriceList = new ArrayList<Integer>();
+	  String auctions [][] = new String[20][20];
+	  int [][] bidsNstartingPrice;
 
       ServerSocket ss = new ServerSocket(4567);
-      System.out.println(" Starting a UDP Echo Server on port " + port +"\n");
+      System.out.println(" Starting an Auction Server on port " + port +"\n");
 
       while(true){
 
@@ -46,8 +38,6 @@ public class Server {
 
 	    while( connection ) {
 
-	      responceMsg = " ";
-
 		  receivedMsg = dataInStream.readUTF();
 
 		  if( receivedMsg.equals("Exit") ){
@@ -58,31 +48,38 @@ public class Server {
 		  else if( receivedMsg.equals("Register") ){
 
 		  	System.out.println(" \n New Auction Registry! \n");
-		  	name = dataInStream.readUTF();
-		  	namesList.add(name);
-		  	System.out.println("Recorded : ' " + name + " ' to --> " + namesList);
 
-		  	description = dataInStream.readUTF();
-		  	descriptionsList.add(description);
-		  	System.out.println("Recorded : ' " + description + " ' to --> " + descriptionsList);
 
-		  	bid = dataInStream.readInt();
-		  	bidsList.add(bid);
-		  	System.out.println("Recorded : ' " + bid + " ' to --> " + bidsList);
+		  	  name = dataInStream.readUTF();
+		  	  auctions[id][0] = name;
+		  	  System.out.println("Recorded : ' " + name + " ' to --> " + auctions[id][0]);
+		  	  responceMsg = name ;
 
-		  	startingPrice = dataInStream.readInt();
-		  	startingPriceList.add(startingPrice);
-		  	System.out.println("Recorded : ' " + (int)startingPrice + " ' to --> " + startingPriceList);
+		  	  for (int j = 1; j <= 2; j++){
 
-		  	System.out.println("Recorded All!");
+		  	  	registryMsg = dataInStream.readUTF();
+		  		auctions[id][j] = registryMsg;
+		  		System.out.println("Recorded : ' " + registryMsg + " ' to --> " + auctions[id][j]);
+		  		responceMsg = responceMsg + " - " + auctions[id][j];
+		  		registryMsg = null;
 
-		  	responceMsg = "Your auction has been Recorder : \n " + namesList + descriptionsList + bidsList + startingPriceList;
+		  	  }
+
+		  	responceMsg = "Your auction has been Recorded : \n " + responceMsg + "\n Your AuctionID is : " + id;
 		  	dataOutStream.writeUTF(responceMsg);
 		  	dataOutStream.flush();
 
-			auctionStrings.add(responceMsg);
-			System.out.println(auctionStrings);
 
+		  	for (int i = 0; i <= id; i++ ){
+		  		for (int j = 0; j<= 2; j++){
+		  			message = message + " - "+ auctions[i][j] ;
+		  		}
+		  		message += "\n"; 
+		  	}
+		  	System.out.println("Recorded Auctions : \n" + message);
+		  	message = "";
+
+		    id ++;
 		  }
 		}
 	  }
