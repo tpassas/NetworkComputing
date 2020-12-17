@@ -11,6 +11,7 @@ public class Server {
 	  boolean connection;
 	  String [][]auctions = new String[20][2];
 	  int [][] bidsNstartingPrice = new int[20][2];
+	  int receivedInt;
 
       ServerSocket ss = new ServerSocket(4567);
       System.out.println(" Starting an Auction Server on port " + port +"\n");
@@ -88,7 +89,8 @@ public class Server {
 			  		    }
 			  	    }
 
-			  	 System.out.println("Recorded Auctions : \n" + message);
+				   System.out.println("Recorded Auctions : \n" + message);
+				   
 
 			     id ++;
 			    }
@@ -99,10 +101,43 @@ public class Server {
 				break;
 
 			  	 
-			    }
+				}
+				/*argy */
+				else if (receivedMsg.equals("Search")) {
+					System.out.println("Client is entering auctionID");
+					receivedInt = dataInStream.readInt();
+					System.out.println("Client entered " + receivedInt);
+					//tell to the user the item with the auction id given
+					dataOutStream.writeUTF("Item name:" + auctions[receivedInt][0]+ "\nItem Description: " + auctions[receivedInt][1] +"\nItem Starting Price " + bidsNstartingPrice[receivedInt][0]  + "\nItem Current Bid: "  + bidsNstartingPrice[receivedInt][1]);
+				}
+				//argy
+				else if (receivedMsg.equals("Show")) {
+					//i changed to id-1 because if it was id it would show one more null option
+					for (int i = 0; i <= id-1; i++ ){
+
+						message += "\n";
+ 
+						for (int j = 0; j<= 1; j++){
+ 
+							message += " - " + auctions[i][j];
+ 
+						   }
+ 
+						for ( int x = 0; x<= 1; x++){
+ 
+							 message += " - " + bidsNstartingPrice[i][x];
+						   }
+					   }
+ 
+					System.out.println("Recorded Auctions : \n" + message);
+					dataOutStream.writeUTF(message);
+					dataOutStream.flush();
+				}
+				
 			}
 	    }
-    }
+	}
+
 
 	/* 
 	Method Name: registerInStringArray
@@ -137,5 +172,5 @@ public class Server {
         public static void sendMsg (String message, DataOutputStream dataOutStream)throws java.io.IOException {
     	dataOutStream.writeUTF(message);
 		dataOutStream.flush();
-    }
+	}
 }
