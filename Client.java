@@ -44,31 +44,32 @@ public class Client {
 		  System.out.println( "\n -------------------------------------- \n Type > Register --> To register a new item for Auction \n Type > Search --> To search for an Auction using the Auction ID. \n Type > Bid --> To bid on an Auction using the Auction ID.");
 		  System.out.println(" Type > Exit --> To quit! \n -------------------------------------- ");
 
-
+		  
 		  toSendMsg = scanner.nextLine();
-		  dataOutStream.writeUTF(toSendMsg);
-		  dataOutStream.flush();
+		  sendMsgStr(dataOutStream,toSendMsg);
 
 		  if(toSendMsg.equals("Exit")) {
 
 		    System.out.println(" You have Disconnected Successfully!");
 			socket1.close();
 			break;
+
 		  } 
 		  else if(toSendMsg.equals("Register")) {
-		    for (int i = 0; i <= 2; i++){
 
-		  	  System.out.println(registerMessages(i));
+		     for (int i = 0; i <= 2; i++){
+
+		  	 System.out.println(registerMessages(i));
 		  	  
-		  	  if(i == 2){
-		  	  	  toSendInt = scanner.nextInt();
-		     	  dataOutStream.writeInt(toSendInt);
-		     	  dataOutStream.flush();
+		  	 if(i == 2){
+
+		  	 	 
+		  	 	 toSendInt = scanner.nextInt();
+		  	  	 sendMsgInt(dataOutStream, toSendInt);
 		  	    }
 
-		      toSendMsg = scanner.nextLine();
-		      dataOutStream.writeUTF(toSendMsg);
-		      dataOutStream.flush();
+			  toSendMsg = scanner.nextLine();
+		      sendMsgStr(dataOutStream, toSendMsg);
 		    }
 
 
@@ -76,9 +77,9 @@ public class Client {
 		  else if(toSendMsg.equals("Search")){
 
 			 System.out.println("Please enter the auction ID");
+
 			 toSendInt = scanner.nextInt();
-		     dataOutStream.writeInt(toSendInt);
-		     dataOutStream.flush();
+			 sendMsgInt(dataOutStream,toSendInt);
 		     System.out.println("Sent : " + toSendInt);
 
 		    }  	
@@ -86,7 +87,23 @@ public class Client {
 		   toReceiveMsg = dataInStream.readUTF();
 		   System.out.println(toReceiveMsg);
 	    }
-	}    	
+	} 
+
+	public static String sendMsgStr(DataOutputStream dataOutStream, String message) throws java.io.IOException{
+
+ 
+		      dataOutStream.writeUTF(message);
+		      dataOutStream.flush();
+		      return message;
+		    
+	}
+
+	public static int sendMsgInt( DataOutputStream dataOutStream, int message) throws java.io.IOException{
+
+			  dataOutStream.writeInt(message);
+		      dataOutStream.flush();
+		      return message;	
+	}  	
 
 
 	public static String registerMessages(int i){

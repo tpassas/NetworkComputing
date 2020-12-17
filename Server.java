@@ -44,44 +44,31 @@ public class Server {
 			  receivedMsg = dataInStream.readUTF();
 
 
-			  if( receivedMsg.equals("Exit") ){
-			  	System.out.println("Client from : " + socket1Use.getAddress() + " ------------> Is now Disconnected!");
-				connection = false;
-				break; 
-			  }
-			  else if( receivedMsg.equals("Register") ){
+			  if( receivedMsg.equals("Register")){
 
-			  	 System.out.println(" \n New Auction Registry! \n");
+				 System.out.println(" \n New Auction Registry! \n");
 
 			  	 for (int i = 0; i <= 3; i++ ){
 
 			  	 	  if ( i == 0 || i == 1 ){
-
-			  	 	  	 registryMsg = dataInStream.readUTF();
-			  		     auctions[id][i] = registryMsg;
-			  		     System.out.println("Recorded : ' " + registryMsg + " ' to --> " + auctions[id][i]);
-			  		     responceMsg += " - " + auctions[id][i];
-			  	         registryMsg = null;
-
+			  	 	  	 
+			  		     responceMsg = registerInStringArray(responceMsg, dataInStream, auctions, id, i);
+			  	         
 			  	 	    } 
 			  	 	  else if (i == 2) {
+			  	 	     
+			  		     responceMsg= registerInIntegerArray(responceMsg, dataInStream, bidsNstartingPrice, id, i);
 
-
-			  	 	     registryInt = dataInStream.readInt();
-			  		     bidsNstartingPrice[id][i-2] = registryInt;
-			  		     System.out.println("Recorded : ' " + registryInt + " ' to --> " + bidsNstartingPrice[id][i-2]);
-			  		     responceMsg += " - " + bidsNstartingPrice[id][i-2];
-			  	         registryInt = 0; 
 			  	 	    }
 			  	 	    else {
+
 			  	 	      bidsNstartingPrice[id][i-2] = 0;
 			  	    	  responceMsg += " - " + bidsNstartingPrice[id][i-2];
 			  	 	    }
 			  	    }
 
 			  	 responceMsg = "Your auction has been Recorded : \n " + responceMsg + "\n Your AuctionID is : " + id;
-			  	 dataOutStream.writeUTF(responceMsg);
-			  	 dataOutStream.flush();
+			  	 sendMsg(responceMsg, dataOutStream);
 
 
 
@@ -90,23 +77,65 @@ public class Server {
 			  	 	message += "\n";
 
 			  		 for (int j = 0; j<= 1; j++){
+
 			  			 message += " - " + auctions[i][j];
+
 			  		    }
+
 			  		 for ( int x = 0; x<= 1; x++){
-			  		 	message += " - " + bidsNstartingPrice[i][x];
-			  		 }
+
+			  		 	 message += " - " + bidsNstartingPrice[i][x];
+			  		    }
 			  	    }
 
 			  	 System.out.println("Recorded Auctions : \n" + message);
 
 			     id ++;
 			    }
+			  else if( receivedMsg.equals("Exit") ){
+
+			  	System.out.println("Client from : " + socket1Use.getAddress() + " ------------> Is now Disconnected!");
+				connection = false;
+				break;
+
+			  	 
+			    }
 			}
 	    }
     }
-    // public static String recordedMessage(String registryMsg, int id, int j, bidsNstartingPrice, auctions){
-    // 	String message;
-    // 	message = "Recorded : ' " + registryMsg + " ' to --> " + bidsNstartingPrice[id][j]
-    // 	return message;
-    // }
+
+	/* 
+	Method Name: registerInStringArray
+	Author: Fotakidis Panagiotis
+	Arguments: 
+		responceMsg: A string collected by the method that will hold the message that will be eventually sent back to the user to confirm his registration.
+		dataInStream: An input stream that allows the incoming information ( from the client ) to be read and utilised.
+
+    */
+    public static String registerInStringArray(String responceMsg, DataInputStream dataInStream, String [][] array, int id, int i)throws java.io.IOException{
+
+    		String registryMsg = dataInStream.readUTF();
+
+    		array[id][i] = registryMsg;
+			System.out.println("Recorded : ' " + registryMsg + " ' to --> " + array[id][i]);
+
+			responceMsg += " - " + array[id][i];
+			return responceMsg;
+    }
+
+    public static String registerInIntegerArray(String responceMsg, DataInputStream dataInStream, int [][] array, int id, int i)throws java.io.IOException{
+
+        	int registryInt = dataInStream.readInt();
+
+    		array[id][i-2] = registryInt;
+			System.out.println("Recorded : ' " + registryInt + " ' to --> " + array[id][i-2]);
+
+			responceMsg += " - " + array[id][i-2];
+			return responceMsg;
+    }
+
+        public static void sendMsg (String message, DataOutputStream dataOutStream)throws java.io.IOException {
+    	dataOutStream.writeUTF(message);
+		dataOutStream.flush();
+    }
 }
