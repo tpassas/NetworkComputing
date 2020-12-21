@@ -2,15 +2,23 @@ import java.util.*;
 import java.net.*;
 import java.io.*;
 
-public class Server {
+public class Server implements Runnable {
+	/* Passas */
+	public void run(){
+			System.out.println("Thread is running");
+	}
+	static Thread myThread;
 
     public static void main( String argv[] ) throws Exception {
-
+		myThread = new Thread(new Server());
+		Server s1 = new Server();
+		s1.run();
       int bid,startingPrice, registryInt, id = 0, port = 4567;
 	  String receivedMsg, registryMsg, name, responceMsg = "",message = "";
 	  boolean connection;
 	  String [][]auctions = new String[20][2];
 	  int [][] bidsNstartingPrice = new int[20][2];
+	  int receivedInt;
 
       ServerSocket ss = new ServerSocket(4567);
       System.out.println(" Starting an Auction Server on port " + port +"\n");
@@ -44,8 +52,8 @@ public class Server {
 			  receivedMsg = dataInStream.readUTF();
 
 
-			  if( receivedMsg.equals("Register")){
-
+			  if( receivedMsg.equals("Register") || receivedMsg.equals("register")){
+				
 				 System.out.println(" \n New Auction Registry! \n");
 
 			  	 for (int i = 0; i <= 3; i++ ){
@@ -88,21 +96,86 @@ public class Server {
 			  		    }
 			  	    }
 
-			  	 System.out.println("Recorded Auctions : \n" + message);
+				   System.out.println("Recorded Auctions : \n" + message);
+				   
 
 			     id ++;
 			    }
-			  else if( receivedMsg.equals("Exit") ){
+				else if( receivedMsg.equals("Exit") || receivedMsg.equals("exit")){
 
-			  	System.out.println("Client from : " + socket1Use.getAddress() + " ------------> Is now Disconnected!");
-				connection = false;
-				break;
+					System.out.println("Client from : " + socket1Use.getAddress() + " ------------> Is now Disconnected!");
+				  connection = false;
+				  break;
+  
+					 
+				  }
+				/*argy */
+				else if (receivedMsg.equals("Search") || receivedMsg.equals("search")) {
+					System.out.println("Client is entering auctionID");
+					receivedInt = dataInStream.readInt();
+					System.out.println("Client entered " + receivedInt);
+					//tell to the user the item with the auction id given
+					dataOutStream.writeUTF("Item name:" + auctions[receivedInt][0]+ "\nItem Description: " + auctions[receivedInt][1] +"\nItem Starting Price " + bidsNstartingPrice[receivedInt][0]  + "\nItem Current Bid: "  + bidsNstartingPrice[receivedInt][1]);
+				}
+				//argy
+				else if (receivedMsg.equals("Show") || receivedMsg.equals("show")) {
+					//i changed to id-1 because if it was id it would show one more null option
+					for (int i = 0; i <= id-1; i++ ){
 
-			  	 
-			    }
+						message += "\n";
+ 
+						for (int j = 0; j<= 1; j++){
+ 
+							message += " - " + auctions[i][j];
+ 
+						   }
+ 
+						for ( int x = 0; x<= 1; x++){
+ 
+							 message += " - " + bidsNstartingPrice[i][x];
+						   }
+					   }
+ 
+					System.out.println("Recorded Auctions : \n" + message);
+					dataOutStream.writeUTF(message);
+					dataOutStream.flush();
+				}/*Passas 
+				How the server handles the option Bid/bid that is given to the user */
+				else if (receivedMsg.equals("Bid") || receivedMsg.equals("bid")){
+					System.out.println("Client is entering auctionID");
+					receivedInt = dataInStream.readInt();
+					System.out.println("Client entered " + receivedInt);
+					dataOutStream.writeUTF("Item name:" + auctions[receivedInt][0]+ "\nItem Description: " + auctions[receivedInt][1]);
+					receivedInt = dataInStream.readInt();
+
+				} 
+				
 			}
-	    }
-    }
+		}
+	}
+	/*public static int AuctionRoom(int ida){
+		ida = dataInStream.readInt();
+		if (ida == id){
+			System.out.println("entering");
+		}
+		return ida;
+	}*/
+	/*Method Name: checkHighestBid
+	Author: Passas
+	Arguments: The int array that we want to find the highest value, in our case bidsNstartingPrice 2d array */
+	public static int checkHighestBid(int[][] numbers) {
+        int maxValue = numbers[0][0];
+        for (int j = 0; j < numbers.length; j++) {
+            for (int i = 0; i < numbers[j].length; i++) {
+                if (numbers[j][i] > maxValue) {
+                    maxValue = numbers[j][i];
+                }
+            }
+        }
+        return maxValue;
+	}
+	
+
 
 	/* 
 	Method Name: registerInStringArray
@@ -137,5 +210,5 @@ public class Server {
         public static void sendMsg (String message, DataOutputStream dataOutStream)throws java.io.IOException {
     	dataOutStream.writeUTF(message);
 		dataOutStream.flush();
-    }
+	}
 }
