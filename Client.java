@@ -1,15 +1,18 @@
-/*
- * Filename: UDPEchoClient.java
- * Description: An echo client using connectionless delivery system (UDP).
- *              Sends character messages to a server which are echoed capitalized.
- *              No error handling and exceptions are implemented.
- * Operation: java UDPEchoCLient [hostname] [port]
+/**
+ * Filename: Client
+ * Description: A Client Class that determines the functionality of the client and the menu that the user see in order to navigate in the program
+ * 
  *
- * Author: Thanos Hatziapostolou
- * Module: Network Computing
+ * Author: Fotakidis Panagiotis
+ * 
+ * @param port The port that the Client will connect through.
+ * @param toSendInt An integer message that is sent to the server.
+ * @param hostname The hostname that the Client will connect with.
+ * @param toReceiveMsg A string message that is received from the server.
+ * @param toSendMsg A string message that is sent to the server.
  */
 
-/* for the use of arraylist and scanner */
+
 import java.util.*;
 import java.net.*;
 import java.io.*;
@@ -19,9 +22,7 @@ public class Client {
 		private static int port, toSendInt ;
 		private static String hostname;
 		private static String toReceiveMsg, toSendMsg;
-		private static int toReceiveAuctionID, toSendAuctionID;
 
-		private static ArrayList<Integer> AuctionNumbers = new ArrayList<Integer>();
 
     public static void main(String [] argv) throws Exception {
 
@@ -38,74 +39,148 @@ public class Client {
 
 		Scanner scanner = new Scanner(System.in);
 
+
+		/**
+		* Author: Fotakidis Panagiotis
+		* Description: A while loop that prevents the Client from exiting the server connection and terminating.
+	  	*/
 		while ( true ) {
 
+			toReceiveMsg = null;
 
-		  System.out.println( "\n -------------------------------------- \n Type > Register --> To register a new item for Auction \n Type > Search --> To search for an Auction using the Auction ID. \n Type > Bid --> To bid on an Auction using the Auction ID.");
+		  System.out.println( "\n -------------------------------------- \n Type > Register --> To register a new item for Auction \n Type > Show --> To see all the live Auctions \n Type > Search --> To search for an Auction using the Auction ID \n Type > Bid --> To Bid");
 		  System.out.println(" Type > Exit --> To quit! \n -------------------------------------- ");
 
 		  
 		  toSendMsg = scanner.nextLine();
 		  sendMsgStr(dataOutStream,toSendMsg);
 
+
+		  /**
+		  * Author: Fotakidis Panagiotis
+		  * Description: If the user enters Exit the programm disconnects from the server.
+		  */
 		  if(toSendMsg.equals("Exit")) {
 
 		    System.out.println(" You have Disconnected Successfully!");
 			socket1.close();
 			break;
 
-		  } 
+		  }
+		  /**
+		  * Author: Fotakidis Panagiotis
+		  * Description: If the user enters Register the programm starts the registration phase where the user registers a new auction by inputting the proper information.
+		  */ 
 		  else if(toSendMsg.equals("Register")) {
 
 		     for (int i = 0; i <= 2; i++){
 
-		  	 System.out.println(registerMessages(i));
+		  	     System.out.println(registerMessages(i));
 		  	  
-		  	 if(i == 2){
+		  	     if(i == 2){
 
-		  	 	 
-		  	 	 toSendInt = scanner.nextInt();
-		  	  	 sendMsgInt(dataOutStream, toSendInt);
-		  	    }
+		  	 	     toSendInt = scanner.nextInt();
+		  	  	      sendMsgInt(dataOutStream, toSendInt);
+		  	        }
 
-			  toSendMsg = scanner.nextLine();
-		      sendMsgStr(dataOutStream, toSendMsg);
-		    }
+			     toSendMsg = scanner.nextLine();
+		         sendMsgStr(dataOutStream, toSendMsg);
+		        }
+            }
+          /**
+		  * Author: Fotakidis Panagiotis
+		  * Description: If the user enters Show the programm starts the Showing phase where in order to show to the user all the active auctions and their Id's.
+		  */ 
+            else if(toSendMsg.equals("Show")){
 
+            	sendMsgStr(dataOutStream,toSendMsg);
 
-		  }
+            }
+          /**
+		  * Author: Argyropoulos Stavros
+		  * Description: If the user enters Search the programm starts the Searching phase where the user can search for a specific auction using a specific auction Id.
+		  */ 
 		  else if(toSendMsg.equals("Search")){
+		  	//argy
+			System.out.println("Please enter the auction ID");
+			toSendInt = scanner.nextInt();
+			sendMsgInt(dataOutStream, toSendInt);
 
-			 System.out.println("Please enter the auction ID");
+			System.out.println("Sent : " + toSendInt);
 
-			 toSendInt = scanner.nextInt();
-			 sendMsgInt(dataOutStream,toSendInt);
-		     System.out.println("Sent : " + toSendInt);
+			toSendMsg = scanner.nextLine();
+		    sendMsgStr(dataOutStream, toSendMsg);
 
-		    }  	
+		    }
+		  /**
+		  * Author: Thrasivoulos Passas, Fotakidis Panagiotis
+		  * Description: If the user enters Bid the programm starts the Bidding phase where the user selects an auction through an auction ID and then he can bid
+		  * in order to have the highest bid and win an auction. If the user bids a lower than neccesarry ammount a proper message is prompted.
+		  */ 
+		  else if (toSendMsg.equals("Bid")){
 
-		   toReceiveMsg = dataInStream.readUTF();
-		   System.out.println(toReceiveMsg);
+			  //passas
+			  System.out.println("Please enter the auction ID");
+			  toSendInt = scanner.nextInt();
+			  sendMsgInt(dataOutStream, toSendInt);
+
+			  System.out.println("How much you want to bid");
+
+			  toSendInt = scanner.nextInt();
+			  sendMsgInt(dataOutStream, toSendInt);    
+		    } 
+
+		    System.out.println(promptReceivedMsg(toReceiveMsg,dataInStream));
 	    }
 	} 
 
-	public static String sendMsgStr(DataOutputStream dataOutStream, String message) throws java.io.IOException{
+	/**
+	* Author: Panagiotis Fotakidis
+	* Writes a string message from the user input to the out going stream towards the Server. 
+	* @param dataOutStream the out going stream from which the data flow to the server
+	* @param message the user input that is going to be sent
+	* @throws java.io.IOException 
+	* @return Nothing
+	*/
+	public static void sendMsgStr(DataOutputStream dataOutStream, String message) throws java.io.IOException{
 
  
 		      dataOutStream.writeUTF(message);
 		      dataOutStream.flush();
-		      return message;
-		    
+		      		    
 	}
-
-	public static int sendMsgInt( DataOutputStream dataOutStream, int message) throws java.io.IOException{
+	/**
+	* Author: Panagiotis Fotakidis
+	* Writes an Integer number from the user input to the out going stream towards the Server. 
+	* @param dataOutStream the out going stream from which the data flow to the server
+	* @param message the user input that is going to be sent
+	* @throws java.io.IOException 
+	* @return Nothing
+	*/
+	public static void sendMsgInt( DataOutputStream dataOutStream, int message) throws java.io.IOException{
 
 			  dataOutStream.writeInt(message);
-		      dataOutStream.flush();
-		      return message;	
+		      dataOutStream.flush();	      	
 	}  	
+	/**
+	* Author: Panagiotis Fotakidis
+	* Reads the icoming message through the incoming stream.
+	* @param dataInStream the incoming stream from which the data flow from the Server
+	* @param message the variable in which the incoming message will be saved.
+	* @throws java.io.IOException 
+	* @return the message that came from the input stream.
+	*/
+	public static String promptReceivedMsg( String message, DataInputStream dataInStream) throws java.io.IOException{
+		message = dataInStream.readUTF();
+		return message;
+	}
 
-
+	/**
+	* Author: Panagiotis Fotakidis
+	* Creates the proper message for the user during the Registration Phase, in order to navigate him/her.
+	* @param i the loop in which the registration phase is currently in to determine which message must be sent.
+	* @return the message that needs to be prompted to the user.
+	*/
 	public static String registerMessages(int i){
 		String message;
 
@@ -117,79 +192,5 @@ public class Client {
 			message = " Write the starting price of the Item !";
 		
 		return message;
-
-	}
-
-
-	/*Argyropoulos! This is a method in order to generate an AuctionID when a client is listing an item *
-/It is not possible to generate the same number!!!! but there is a limited range of numbers from 1000 to 10000*/
-	
-	public static int generateAuctionID() {
-		ArrayList<Integer> numbers = new ArrayList<Integer>();
-		Random random = new Random();
-			for (int i=1000; i<=10000; i++)
-    		numbers.add(i);
-			Collections.shuffle(numbers);
-			// System.out.println(numbers.get(0));
-			AuctionNumbers.add(numbers.get(0));
-			return numbers.get(0);
-
-	}
-
-	/*Argyropoulos! a method where the user will be able to list an item for an auction */
-	public  static void listItem() {
-		Scanner scanner = new Scanner(System.in);
-		/*Argyropoulos! Have to make exceptions if a user enters int instead of string and so on */
-		System.out.println("Enter the name of the Item ");
-		String itemName = scanner.nextLine();
-
-		System.out.println("Enter a description for your item");
-		String itemDescription = scanner.nextLine();
-
-		System.out.println("Enter your item's Starting price");
-		int itemStartPrice = scanner.nextInt();
-
-		//Argyropoulos! (for later) System.out.println("Enter the type of the auction");
-
-		System.out.println("\n Thank you! These are the cresendials you entered.\n Item name : " + itemName + "\n Item Description : " + itemDescription + " \n Starting Price : " +itemStartPrice);
-
-		System.out.println("\n The auction ID for this auction is : " + generateAuctionID());
-	}
-
-
-	/*Argyropoulos! When a client wants to enter in an Auction */
-	public static void enterAuction(){
-		Scanner sc = new Scanner(System.in);
-		System.out.println("Please enter the auction ID");
-		int auctionID = sc.nextInt();
-		/*Argyropoulos! checks to our AuctionNumbers Arraylist if the auctionID of the user it exists*/
-		if (AuctionNumbers.contains(auctionID)) {
-			/*Argyropoulos! probably make the auction room */
-			System.out.println("YEA");
-		}
-		
 	}
 }
-
-/*
- * Example:
- *   java UDPEchoClient 192.168.12.12 4567
- * Output:
- *	 Type text to send to server:
- *   Hello server.
- *   Received: HELLO SERVER.
- */
-		
-/*** EXTRA INFORMATION ***/		
-/*
-DatagramPacket: it implements UDP Socket communication.
-DatagramSocket: it is used for UDP communication.
-BufferedReader: it supports input buffering. It provides the readLine() method for reading an entire line at a
-                time from a stream.
-InputStreamReader: reads a stream. It is used to convert between byte streams and character streams. It provides
-                   a bridge between byte-oriented and character-oriented input streams.
-*/
-
-/*
-If the server is not 'alive' the program blocks. To resolve this, you need to catch the exceptions and handle them.
-*/
